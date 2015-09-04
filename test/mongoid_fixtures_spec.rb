@@ -21,8 +21,7 @@ end
 describe MongoidFixtures do
   describe '::load' do
     it 'loads fixtures into the db and returns a hash of the fixtures' do
-      cities = MongoidFixtures::load(City)
-      puts cities
+      MongoidFixtures::load(City).should_not be_nil
     end
   end
 end

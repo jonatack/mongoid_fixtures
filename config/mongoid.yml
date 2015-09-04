@@ -1,0 +1,6 @@
+development:
+  clients:
+    default:
+      database: mongoid_fixtures_development
+      hosts:
+        - 127.0.0.1:27017

@@ -1,8 +1,8 @@
 # MongoidFixtures
+Fixtures for Ruby without Rails for Mongoid.
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/mongoid_fixtures`. To experiment with that code, run `bin/console` for an interactive prompt.
+There are only two dependencies: 'linguistics' to provide plurality conversion and mongoid for obvious reasons
 
-TODO: Delete this and the text above, and describe your gem
 
 ## Installation
 
@@ -22,7 +22,54 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+1.  Create a class that has Mongoid::Document as a mixin.
+    For example:    
+    
+        class City # should be in single form      
+          include Mongoid::Document    
+          field :population, type: Integer
+          field :demonym, type: String
+          field :settled, type: Integer
+          field :consolidated, type: Integer
+          field :population, type: Integer
+          field :custom_attributes, type: Array
+          field :state, type: String
+        end
+2.  Define a fixtures yml in /test/fixtures/ with a plural form of the class
+    For example /test/fixtures/cities.yml:    
+    
+        :new_york_city:
+          population: 9_000_000
+          demonym: New Yorker
+          settled: 1624
+          consolidated: 1989
+          custom_attributes:
+            - boroughs: ['Manhattan', 'The Bronx', 'Brooklyn', 'Queens', 'Staten Island']
+          state: New York
+        :terrytown:
+          state: Lousiana
+          population: 24_000
+
+    This library also supports nested attributes. Document on that will be provided when I get some time.
+    
+3.  Invoke `MongoidFixtures::load(City)`
+4.  The above method invocation will load all test fixture instances of City objects defined in /test/fixtures/cities.yml
+5.  Use your fixtures!
+
+        cities = MongoidFixtures::load(City)
+        puts cities # returns {
+                    #     :new_york_city=>#<City _id: 55e920cde13823757a000000, 
+                    #     population: 9000000, demonym: "New Yorker", settled: 1624, 
+                    #     consolidated: 1989, custom_attributes:  
+                    #     [{"boroughs"=>["Manhattan", "The Bronx",
+                    #     "Brooklyn", "Queens", "Staten Island"]}], 
+                    #      state: "New York">, :terrytown=>#<City _id: 55e920cde13823757a000001, 
+                    #     population: 24000, demonym: nil, 
+                    #     settled: nil, consolidated: nil,
+                    #     custom_attributes: nil, state: "Lousiana">
+                    #}
+
+
 
 ## Development
 
@@ -32,7 +79,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/mongoid_fixtures.
+Bug reports and pull requests are welcome on GitHub at https://github.com/nycjv321/mongoid_fixtures.
 
 
 ## License

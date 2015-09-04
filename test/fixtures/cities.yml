@@ -1,0 +1,11 @@
+:new_york_city:
+  population: 9_000_000
+  demonym: New Yorker
+  settled: 1624
+  consolidated: 1989
+  custom_attributes:
+    - boroughs: ['Manhattan', 'The Bronx', 'Brooklyn', 'Queens', 'Staten Island']
+  state: New York
+:terrytown:
+  state: Lousiana
+  population: 24_000

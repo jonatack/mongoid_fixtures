@@ -31,7 +31,7 @@ Or install it yourself as:
           field :consolidated, type: Integer
           field :population, type: Integer
           field :custom_attributes, type: Array
-          has_one :geo_uri_scheme
+          belongs_to :geo_uri_scheme
         end
 
         class City < GeopoliticalDivision
@@ -55,7 +55,6 @@ Or install it yourself as:
           field :x, type: Float
           field :y, type: Float
           field :z, type: Float
-          belongs_to :geopolitical_division
 
           alias :longitude :x
           alias :latitude :y

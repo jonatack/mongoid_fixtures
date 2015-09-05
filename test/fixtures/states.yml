@@ -1,0 +1,16 @@
+:new_york:
+  name: New York
+  population: 20_000_000
+  demonym: New Yorker
+  capital: Albany
+  motto: Excelsior
+  admission_to_union: July 26th, 1788
+  time_zone: "Eastern: UTC -5/-4"
+:louisiana:
+  name: Louisiana
+  population: 4_700_000
+  demonym: Louisianian
+  capital: Baton Rouge
+  motto: Union, Justice, Confidence
+  admission_to_union: April 30th, 1812
+  time_zone: "Central: UTC −6/−5"

@@ -1,5 +1,5 @@
 development:
-  clients:
+  sessions:
     default:
       database: mongoid_fixtures_development
       hosts:

@@ -16,7 +16,7 @@ module MongoidFixtures
 
     def self.load
       fix = MongoidFixtures::Loader.instance
-      fixture_names = Dir[File.join(Dir.getwd, "#{path}/*.yml")]
+      fixture_names = Dir[File.join(File.expand_path('../..', __FILE__), "#{path}/*.yml")]
 
       fixture_names.each do |fixture|
         fix.fixtures[File.basename(fixture, '.*')] = YAML.load_file(fixture)
@@ -52,7 +52,8 @@ module MongoidFixtures
         # If the current value is a symbol then it respresents another fixture.
         # Find it and store its id
         if value.is_a? Symbol
-          instance[field] = self.load(field_clazz)[value].id
+         # instance[field] = self.load(field_clazz)[value].id # embedded fields?
+          instance.send("#{field}=", self.load(field_clazz)[value]) # referenced fields? Will need logic to figure out when to do it
         # If the current value is an array find each fixture_instance and get its document to serialize
         # This approach (should) assume nested documents. This will be addressed in later versions
         elsif value.is_a? Array
@@ -71,15 +72,20 @@ module MongoidFixtures
         end
       end
 
-      if instance.class.where(instance.as_document.delete_if {|key, value| key.to_s.match(/_id/)}).exists?
-        instance = instance.class.find_by(instance.as_document.delete_if {|key, value| key.to_s.match(/_id/)})
-      else
-        instance.save! # auto serialize the document
-      end
 
+      instance = create_or_save_instance(instance)
       instances[key] = instance # store it based on its key name
     end
     instances
+  end
+
+  def self.create_or_save_instance(instance)
+    if instance.class.where(instance.as_document.delete_if {|key, value| key.to_s.eql?('_id')}).exists?
+      instance = instance.class.find_by(instance.as_document.delete_if {|key, value| key.to_s.match(/_id/)})
+    else
+      instance.save! # auto serialize the document
+    end
+    instance
   end
 
   def self.resolve_class_ignore_plurality(class_name)

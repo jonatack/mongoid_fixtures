@@ -1,6 +1,12 @@
 :new_york_city:
   name: New York City
-  population: 9_000_000
+  :population:
+    total: 9_000_000
+    rank: 1
+    density: 10,756.0/km2
+    msa: 20,092,883
+    csa: 23,632,722
+    source: U.S. Census (2014)
   demonym: New Yorker
   settled: 1624
   consolidated: 1989
@@ -11,5 +17,6 @@
 :terrytown:
   name: Terrytown
   state: :louisiana
-  population: 24_000
+  :population:
+    total: 24_000
   geo_uri_scheme: :terrytown

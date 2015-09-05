@@ -33,7 +33,7 @@ module MongoidFixtures
     end
   end
 
-  Linguistics.use( :en )
+  Linguistics.use(:en)
   Loader::path = 'test/fixtures'
   Loader::load
 
@@ -52,10 +52,22 @@ module MongoidFixtures
         # If the current value is a symbol then it respresents another fixture.
         # Find it and store its id
         if value.is_a? Symbol
-         # instance[field] = self.load(field_clazz)[value].id # embedded fields?
-          instance.send("#{field}=", self.load(field_clazz)[value]) # referenced fields? Will need logic to figure out when to do it
-        # If the current value is an array find each fixture_instance and get its document to serialize
-        # This approach (should) assume nested documents. This will be addressed in later versions
+
+
+          relations = instance.reload_relations
+          if relations.include? field
+            if relations[field].relation.eql? Mongoid::Relations::Referenced::In
+              instance.send("#{field}=", self.load(field_clazz)[value]) # referenced fields? Will need logic to figure out when to do it
+            else
+              # instance[field] = self.load(field_clazz)[value].id # embedded fields?
+              raise "#{instance} relationship not defined: #{relations[field].relation}"
+            end
+          else
+            raise 'Symbol doesn\'t reference relationship'
+          end
+
+          # If the current value is an array find each fixture_instance and get its document to serialize
+          # This approach (should) assume nested documents. This will be addressed in later versions
         elsif value.is_a? Array
           values = []
           value.each do |v|
@@ -66,7 +78,7 @@ module MongoidFixtures
             end
           end
           instance[field] = values
-        # else just set the field
+          # else just set the field
         else
           instance[field] = value
         end
@@ -80,8 +92,8 @@ module MongoidFixtures
   end
 
   def self.create_or_save_instance(instance)
-    if instance.class.where(instance.as_document.delete_if {|key, value| key.to_s.eql?('_id')}).exists?
-      instance = instance.class.find_by(instance.as_document.delete_if {|key, value| key.to_s.match(/_id/)})
+    if instance.class.where(instance.as_document.delete_if { |key, value| key.to_s.eql?('_id') }).exists?
+      instance = instance.class.find_by(instance.as_document.delete_if { |key, value| key.to_s.match(/_id/) })
     else
       instance.save! # auto serialize the document
     end
@@ -99,7 +111,7 @@ module MongoidFixtures
       end
     end
   end
-  
+
   def self.class_exists?(class_name)
     klass = Module.const_get(class_name)
     return klass.is_a?(Class)

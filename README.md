@@ -50,7 +50,7 @@ Or install it yourself as:
           state: Lousiana
           population: 24_000
 
-    This library also supports nested attributes. Document on that will be provided when I get some time.
+    This library also supports nested attributes. Documentation on that will be provided when I get some time.
     
 3.  Invoke `MongoidFixtures::load(City)`
 4.  The above method invocation will load all test fixture instances of City objects defined in /test/fixtures/cities.yml

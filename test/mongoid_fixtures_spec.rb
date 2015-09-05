@@ -2,7 +2,7 @@ require_relative '../lib/mongoid_fixtures'
 require 'mongoid'
 require 'rspec'
 
-Mongoid.load!("#{File.dirname(__FILE__)}/../config.yml", :development)
+Mongoid.load!("#{Dir.getwd}/config.yml", :development)
 
 class City
   include Mongoid::Document
@@ -14,7 +14,6 @@ class City
   field :population, type: Integer
   field :custom_attributes, type: Array
   field :state, type: String
-
 end
 
 

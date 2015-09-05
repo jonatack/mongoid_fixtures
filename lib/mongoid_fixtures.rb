@@ -16,7 +16,7 @@ module MongoidFixtures
 
     def self.load
       fix = MongoidFixtures::Loader.instance
-      fixture_names = Dir[File.join(File.dirname(__FILE__), "../#{path}/*.yml")]
+      fixture_names = Dir[File.join(Dir.getwd, "#{path}/*.yml")]
 
       fixture_names.each do |fixture|
         fix.fixtures[File.basename(fixture, '.*')] = YAML.load_file(fixture)
@@ -52,7 +52,7 @@ module MongoidFixtures
         # If the current value is a symbol then it respresents another fixture.
         # Find it and store its id
         if value.is_a? Symbol
-          instance[field] = field_clazz.load(Loader.instance.fixtures([field.en.plural]))[value].id
+          instance[field] = self.load(field_clazz)[value].id
         # If the current value is an array find each fixture_instance and get its document to serialize
         # This approach (should) assume nested documents. This will be addressed in later versions
         elsif value.is_a? Array
@@ -61,7 +61,7 @@ module MongoidFixtures
             if field_clazz.nil?
               values << v
             else
-              values << field_clazz.load(Loader.instance.fixtures([field]))[v].as_document
+              values << self.load(field_clazz)[v].as_document
             end
           end
           instance[field] = values
@@ -70,7 +70,13 @@ module MongoidFixtures
           instance[field] = value
         end
       end
-      instance.save! # auto serialize the document
+
+      if instance.class.where(instance.as_document.delete_if {|key, value| key.to_s.match(/_id/)}).exists?
+        instance = instance.class.find_by(instance.as_document.delete_if {|key, value| key.to_s.match(/_id/)})
+      else
+        instance.save! # auto serialize the document
+      end
+
       instances[key] = instance # store it based on its key name
     end
     instances

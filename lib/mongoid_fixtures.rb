@@ -40,6 +40,9 @@ module MongoidFixtures
   def self.load(clazz)
     fixture_instances = Loader.instance.fixtures[clazz.to_s.downcase.en.plural] # get class name
     instances = {}
+    if fixture_instances.nil?
+      raise "Could not find instances for #{clazz}"
+    end
     fixture_instances.each do |key, fixture_instance|
       instance = clazz.new
       fields = fixture_instance.keys
@@ -51,13 +54,11 @@ module MongoidFixtures
 
         # If the current value is a symbol then it respresents another fixture.
         # Find it and store its id
-        if value.is_a? Symbol
-
-
-          relations = instance.reload_relations
+        if value.is_a? Symbol or value.nil?
+          relations = instance.relations
           if relations.include? field
-            if relations[field].relation.eql? Mongoid::Relations::Referenced::In
-              instance.send("#{field}=", self.load(field_clazz)[value]) # referenced fields? Will need logic to figure out when to do it
+            if relations[field].relation.eql? Mongoid::Relations::Referenced::In or relations[field].relation.eql? Mongoid::Relations::Referenced::One
+              instance.send("#{field}=", self.load(field_clazz)[value])
             else
               # instance[field] = self.load(field_clazz)[value].id # embedded fields?
               raise "#{instance} relationship not defined: #{relations[field].relation}"
@@ -92,8 +93,8 @@ module MongoidFixtures
   end
 
   def self.create_or_save_instance(instance)
-    if instance.class.where(instance.as_document.delete_if { |key, value| key.to_s.eql?('_id') }).exists?
-      instance = instance.class.find_by(instance.as_document.delete_if { |key, value| key.to_s.match(/_id/) })
+    if instance.class.where(instance.attributes.select { |key, value| !key.to_s.eql?('_id') }).exists?
+      instance = instance.class.find_by(instance.attributes.select { |key, value| !key.to_s.eql?('_id') })
     else
       instance.save! # auto serialize the document
     end
@@ -101,6 +102,7 @@ module MongoidFixtures
   end
 
   def self.resolve_class_ignore_plurality(class_name)
+    class_name = class_name.split('_').map(&:capitalize).join('')
     if class_exists?(class_name) then
       Kernel.const_get(class_name)
     else

@@ -1,9 +1,6 @@
 # MongoidFixtures
 Fixtures for Ruby without Rails for Mongoid.
 
-There are only two dependencies: 'linguistics' to provide plurality conversion and mongoid for obvious reasons
-
-
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -20,11 +17,10 @@ Or install it yourself as:
 
     $ gem install mongoid_fixtures
 
-## Usage
+## Example Usage
 
-1.  Create a class or classes that have Mongoid::Document defined as a mixin.
-    For example:    
-    
+1.  Define some Mongoid Documents
+
         class GeopoliticalDivision
           include Mongoid::Document
           field :name, type: String
@@ -35,21 +31,40 @@ Or install it yourself as:
           field :consolidated, type: Integer
           field :population, type: Integer
           field :custom_attributes, type: Array
+          has_one :geo_uri_scheme
         end
-        
+
         class City < GeopoliticalDivision
           include Mongoid::Document
           belongs_to :state
         end
+
         class State
           include Mongoid::Document
+
           field :motto, type: String
           field :admission_to_union, type: String
+
           has_many :cities
+
         end
 
-2.  Define a fixtures yml in /test/fixtures/ with a plural form of the class
-    For example /test/fixtures/cities.yml:    
+        class GeoUriScheme
+          include Mongoid::Document
+
+          field :x, type: Float
+          field :y, type: Float
+          field :z, type: Float
+          belongs_to :geopolitical_division
+
+          alias :longitude :x
+          alias :latitude :y
+          alias :altitude :z
+        end
+
+2.  Definefixtures  in /test/fixtures/ with a plural form of the class
+
+    /test/fixtures/cities.yml:    
     
         :new_york_city:
           name: New York City
@@ -60,12 +75,14 @@ Or install it yourself as:
           custom_attributes:
             - boroughs: ['Manhattan', 'The Bronx', 'Brooklyn', 'Queens', 'Staten Island']
           state: :new_york
+          geo_uri_scheme: :new_york_city
         :terrytown:
           name: Terrytown
           state: :louisiana
           population: 24_000
+          geo_uri_scheme: :terrytown
 
-    and /test/fixtures/states.yml:   
+    /test/fixtures/states.yml:   
         
         :new_york:
           name: New York
@@ -83,65 +100,106 @@ Or install it yourself as:
           motto: Union, Justice, Confidence
           admission_to_union: April 30th, 1812
           time_zone: "Central: UTC −6/−5"
+
+    /test/fixtures/geourischemes.yml
+
+        :terrytown:
+          x: -90.029444
+          y: 29.902222
+          z: 3.9624
+        :new_york_city:
+          x: -74.0059
+          y: 40.7127
+          z: 0.6096
             
 
-    You may notice that referred attributes are automatically referenced for you. 
-    This allows you to effortlessly maintain object references in yml and transfer 
-    them to a db.  Currently, this library only supports 1-n referenced relationships. 
-    Later versions will support other relationships (e.g. 1-1 embedded and 1-n embedded)
+    You may notice attributes that represent relationships are automatically converted to
+    the corresponding ruby objects based on the provided id. Currently, this library supports
+    1-N referenced relationships and 1-1 referenced relationships. Later versions will
+    support other relationships such as 1-1 embedded and 1-N embedded relationships.
     
 3.  Invoke `MongoidFixtures::load(City)`
-4.  The above method invocation will load all test fixture instances of City objects defined in /test/fixtures/cities.yml
+4.  The above method invocation will load all test fixture instances of City objects defined
+    in /test/fixtures/cities.yml as well as dependent objects
 5.  Use your fixtures!
 
         cities = MongoidFixtures::load(City)
-        puts cities # returns {
-                    #:new_york_city=>#<City _id: 55ea7bb6b943cdcc3ab4aed4, name:
-                    # "New York City", population: 9000000, time_zone: nil
-                    # , demonym: "New Yorker", settled: 1624, 
-                    # consolidated: 1989, custom_attributes: 
-                    # [{"boroughs"=>["Manhattan", "The Bronx", "Brooklyn", 
-                    # "Queens", "Staten Island"]}], _type: "City", 
-                    # state_id: BSON::ObjectId('55ea7bb5b943cdcc3ab4aed2')>, 
-                    # :terrytown=>#<City _id: 55ea7bb6b943cdcc3ab4aed5, 
-                    # name: "Terrytown", population: 24000, 
-                    # time_zone: nil, demonym: nil, settled: nil, consolidated: nil, 
-                    # custom_attributes: nil, _type: "City", 
-                    # state_id: BSON::ObjectId('55ea7bb5b943cdcc3ab4aed3')>
-                    # }
-    
+        puts cities # {:new_york_city=>#<City _id: 55eb4493e13823466d000002, name: "New York City", population: 9000000, time_zone: nil, demonym: "New Yorker", settled: 1624, consolidated: 1989, custom_attributes: [{"boroughs"=>["Manhattan", "The Bronx", "Brooklyn", "Queens", "Staten Island"]}], _type: "City", state_id: BSON::ObjectId('55eb4493e13823466d000000')>, :terrytown=>#<City _id: 55eb4493e13823466d000005, name: "Terrytown", population: 24000, time_zone: nil, demonym: nil, settled: nil, consolidated: nil, custom_attributes: nil, _type: "City", state_id: BSON::ObjectId('55eb4493e13823466d000001')>}
+
     In the DB:
       
         /* 0 */
         {
-            "_id" : ObjectId("55ea7bb6b943cdcc3ab4aed4"),
+            "_id" : ObjectId("55eb4493e13823466d000003"),
+            "x" : -90.029444,
+            "y" : 29.902222,
+            "z" : 3.9624,
+            "geopolitical_division_id" : ObjectId("55eb4493e13823466d000005")
+        }
+
+        /* 1 */
+        {
+            "_id" : ObjectId("55eb4493e13823466d000004"),
+            "x" : -74.0059,
+            "y" : 40.7127,
+            "z" : 0.6096,
+            "geopolitical_division_id" : ObjectId("55eb4493e13823466d000002")
+        }
+
+        /* 0 */
+        {
+            "_id" : ObjectId("55eb4493e13823466d000002"),
             "_type" : "City",
             "name" : "New York City",
             "population" : 9000000,
             "demonym" : "New Yorker",
             "settled" : 1624,
             "consolidated" : 1989,
-            "custom_attributes" : [ 
+            "custom_attributes" : [
                 {
-                    "boroughs" : [ 
-                        "Manhattan", 
-                        "The Bronx", 
-                        "Brooklyn", 
-                        "Queens", 
+                    "boroughs" : [
+                        "Manhattan",
+                        "The Bronx",
+                        "Brooklyn",
+                        "Queens",
                         "Staten Island"
                     ]
                 }
             ],
-            "state_id" : ObjectId("55ea7bb5b943cdcc3ab4aed2")
+            "state_id" : ObjectId("55eb4493e13823466d000000")
         }
-        
+
         /* 1 */
         {
-            "_id" : ObjectId("55ea7bb6b943cdcc3ab4aed5"),
+            "_id" : ObjectId("55eb4493e13823466d000005"),
             "_type" : "City",
             "name" : "Terrytown",
-            "state_id" : ObjectId("55ea7bb5b943cdcc3ab4aed3"),
+            "state_id" : ObjectId("55eb4493e13823466d000001"),
             "population" : 24000
+        }
+
+        /* 0 */
+        {
+            "_id" : ObjectId("55eb4493e13823466d000000"),
+            "name" : "New York",
+            "population" : 20000000,
+            "demonym" : "New Yorker",
+            "capital" : "Albany",
+            "motto" : "Excelsior",
+            "admission_to_union" : "July 26th, 1788",
+            "time_zone" : "Eastern: UTC -5/-4"
+        }
+
+        /* 1 */
+        {
+            "_id" : ObjectId("55eb4493e13823466d000001"),
+            "name" : "Louisiana",
+            "population" : 4700000,
+            "demonym" : "Louisianian",
+            "capital" : "Baton Rouge",
+            "motto" : "Union, Justice, Confidence",
+            "admission_to_union" : "April 30th, 1812",
+            "time_zone" : "Central: UTC −6/−5"
         }
 
 

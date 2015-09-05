@@ -7,7 +7,9 @@
   custom_attributes:
     - boroughs: ['Manhattan', 'The Bronx', 'Brooklyn', 'Queens', 'Staten Island']
   state: :new_york
+  geo_uri_scheme: :new_york_city
 :terrytown:
   name: Terrytown
   state: :louisiana
   population: 24_000
+  geo_uri_scheme: :terrytown

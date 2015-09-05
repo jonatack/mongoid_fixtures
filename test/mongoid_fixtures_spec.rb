@@ -14,7 +14,7 @@ class GeopoliticalDivision
   field :consolidated, type: Integer
   field :population, type: Integer
   field :custom_attributes, type: Array
-  has_one :geo_uri_scheme
+  belongs_to :geo_uri_scheme
 end
 
 class City < GeopoliticalDivision
@@ -38,7 +38,6 @@ class GeoUriScheme
   field :x, type: Float
   field :y, type: Float
   field :z, type: Float
-  belongs_to :geopolitical_division
 
   alias :longitude :x
   alias :latitude :y

@@ -124,31 +124,29 @@ Or install it yourself as:
 5.  Use your fixtures!
 
         cities = MongoidFixtures::load(City)
-        puts cities # {:new_york_city=>#<City _id: 55eb4493e13823466d000002, name: "New York City", population: 9000000, time_zone: nil, demonym: "New Yorker", settled: 1624, consolidated: 1989, custom_attributes: [{"boroughs"=>["Manhattan", "The Bronx", "Brooklyn", "Queens", "Staten Island"]}], _type: "City", state_id: BSON::ObjectId('55eb4493e13823466d000000')>, :terrytown=>#<City _id: 55eb4493e13823466d000005, name: "Terrytown", population: 24000, time_zone: nil, demonym: nil, settled: nil, consolidated: nil, custom_attributes: nil, _type: "City", state_id: BSON::ObjectId('55eb4493e13823466d000001')>}
+        puts cities # {:new_york_city=>#<City _id: 55eb4adae1382309c5000002, name: "New York City", population: 9000000, time_zone: nil, demonym: "New Yorker", settled: 1624, consolidated: 1989, custom_attributes: [{"boroughs"=>["Manhattan", "The Bronx", "Brooklyn", "Queens", "Staten Island"]}], geo_uri_scheme_id: BSON::ObjectId('55eb4adae1382309c5000004'), _type: "City", state_id: BSON::ObjectId('55eb4ad9e1382309c5000000')>, :terrytown=>#<City _id: 55eb4adae1382309c5000005, name: "Terrytown", population: 24000, time_zone: nil, demonym: nil, settled: nil, consolidated: nil, custom_attributes: nil, geo_uri_scheme_id: BSON::ObjectId('55eb4adae1382309c5000003'), _type: "City", state_id: BSON::ObjectId('55eb4adae1382309c5000001')>}
 
     In the DB:
       
         /* 0 */
         {
-            "_id" : ObjectId("55eb4493e13823466d000003"),
+            "_id" : ObjectId("55eb4adae1382309c5000003"),
             "x" : -90.029444,
             "y" : 29.902222,
-            "z" : 3.9624,
-            "geopolitical_division_id" : ObjectId("55eb4493e13823466d000005")
+            "z" : 3.9624
         }
 
         /* 1 */
         {
-            "_id" : ObjectId("55eb4493e13823466d000004"),
+            "_id" : ObjectId("55eb4adae1382309c5000004"),
             "x" : -74.0059,
             "y" : 40.7127,
-            "z" : 0.6096,
-            "geopolitical_division_id" : ObjectId("55eb4493e13823466d000002")
+            "z" : 0.6096
         }
 
         /* 0 */
         {
-            "_id" : ObjectId("55eb4493e13823466d000002"),
+            "_id" : ObjectId("55eb4adae1382309c5000002"),
             "_type" : "City",
             "name" : "New York City",
             "population" : 9000000,
@@ -166,21 +164,23 @@ Or install it yourself as:
                     ]
                 }
             ],
-            "state_id" : ObjectId("55eb4493e13823466d000000")
+            "state_id" : ObjectId("55eb4ad9e1382309c5000000"),
+            "geo_uri_scheme_id" : ObjectId("55eb4adae1382309c5000004")
         }
 
         /* 1 */
         {
-            "_id" : ObjectId("55eb4493e13823466d000005"),
+            "_id" : ObjectId("55eb4adae1382309c5000005"),
             "_type" : "City",
             "name" : "Terrytown",
-            "state_id" : ObjectId("55eb4493e13823466d000001"),
-            "population" : 24000
+            "state_id" : ObjectId("55eb4adae1382309c5000001"),
+            "population" : 24000,
+            "geo_uri_scheme_id" : ObjectId("55eb4adae1382309c5000003")
         }
 
         /* 0 */
         {
-            "_id" : ObjectId("55eb4493e13823466d000000"),
+            "_id" : ObjectId("55eb4ad9e1382309c5000000"),
             "name" : "New York",
             "population" : 20000000,
             "demonym" : "New Yorker",
@@ -192,7 +192,7 @@ Or install it yourself as:
 
         /* 1 */
         {
-            "_id" : ObjectId("55eb4493e13823466d000001"),
+            "_id" : ObjectId("55eb4adae1382309c5000001"),
             "name" : "Louisiana",
             "population" : 4700000,
             "demonym" : "Louisianian",

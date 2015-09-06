@@ -14,6 +14,8 @@ class GeopoliticalDivision
   field :custom_attributes, type: Array
   belongs_to :geo_uri_scheme
   embeds_one :population
+  embeds_many :people
+
 end
 
 class Population
@@ -56,6 +58,24 @@ class GeoUriScheme
   alias :altitude :z
 end
 
+class Person
+  include Mongoid::Document
+
+  embedded_in :geopolitical_division
+
+  field :first_name, type: String
+  field :paternal_surname, type: String
+  field :born, type: Date
+  field :description, type: String
+  field :middle_name, type: String
+  field :suffix, type: String
+  field :died, type: Date
+  field :maternal_surname, type: String
+  field :nick_names, type: Array
+
+end
+
+
 describe MongoidFixtures do
   describe '::load' do
     it 'loads fixtures into the db and returns a hash of the fixtures' do
@@ -79,7 +99,18 @@ describe MongoidFixtures do
       population.msa.should eq  20092883
       population.csa.should eq  23632722
       population.source.should eq  'U.S. Census (2014)'
-
+      
+      new_york_city.people.should_not be_empty
+      
+      christopher_big_wallace = new_york_city.people[-1]
+      christopher_big_wallace.first_name.should eq 'Christopher'
+      christopher_big_wallace.middle_name.should eq 'George'
+      christopher_big_wallace.paternal_surname.should eq 'Latore'
+      christopher_big_wallace.maternal_surname.should eq 'Wallace'
+      christopher_big_wallace.nick_names.should eq ['The Notorious B.I.G.', 'B.I.G.', 'Biggie Smalls', 'Big Poppa', 'Frank White', 'King of New York']
+      christopher_big_wallace.born.should eq (Date.parse('Sun, 21 May 1972'))
+      christopher_big_wallace.died.should eq (Date.parse('Sun, 09 Mar 1997'))
+      christopher_big_wallace.description.should eq 'was an American rapper. Wallace is consistently ranked as one of the greatest rappers ever and one of the most influential rappers of all time.'
 
       terrytown = cities[:terrytown]
       terrytown.should_not be_nil

@@ -2,6 +2,7 @@ require_relative '../lib/mongoid_fixtures/version'
 require 'yaml'
 require 'singleton'
 require 'linguistics'
+require 'active_support/inflector'
 
 module MongoidFixtures
 
@@ -67,26 +68,22 @@ module MongoidFixtures
             raise 'Symbol doesn\'t reference relationship'
           end
 
-          # If the current value is an array find each fixture_instance and get its document to serialize
-          # This approach (should) assume nested documents. This will be addressed in later versions
         elsif value.is_a? Array
           values = []
           value.each do |v|
             if field_clazz.nil?
               values << v
             else
-              values << self.load(field_clazz)[v].as_document
+              values << create_embedded_instance(field_clazz, v, instance)
             end
           end
-          instance[field] = values
+          if instance[field].nil?
+            instance[field] = []
+          end
+          instance[field].concat(values)
         elsif value.is_a? Hash
           # take hash convert it to object and serialize it
-          embedded_object = field_clazz.new
-          value.each do |key, value|
-            embedded_object.send("#{key}=", value)
-          end
-          embedded_object.send("#{find_embedd_parent_class(embedded_object)}=", instance)
-          instance[field] = value
+          instance[field] = create_embedded_instance(field_clazz, value, instance)
         # else just set the field
         else
           instance[field] = value
@@ -100,8 +97,17 @@ module MongoidFixtures
     instances
   end
 
-  def self.find_embedd_parent_class(embedd)
-    relations = embedd.relations
+  def self.create_embedded_instance(clazz, hash, instance)
+    embed = clazz.new
+    hash.each do |key, value|
+      embed.send("#{key}=", value)
+    end
+    embed.send("#{find_embed_parent_class(embed)}=", instance)
+    embed
+  end
+
+  def self.find_embed_parent_class(embed)
+    relations = embed.relations
 
     relations.each do |name, relation|
       if relation.relation.eql? Mongoid::Relations::Embedded::In
@@ -128,13 +134,32 @@ module MongoidFixtures
 
   def self.flatten_attributes(attributes)
     flattened_attributes = {}
-    attributes.each do |key, values|
-      if values.is_a? Hash
-        values.each do |value, inner_value|
-          flattened_attributes["#{key}.#{value}"] = inner_value
+    if attributes.is_a? String
+      return attributes
+    end
+    if attributes.is_a? Mongoid::Document
+      attributes.attributes.each do |name, attribute|
+        unless name.eql? '_id'
+          flattened_attributes["#{attributes.class.to_s.downcase}.#{name}"] = attribute
         end
-      else
-        flattened_attributes[key] = values
+      end
+    else
+
+      attributes.each do |key, values|
+        if values.is_a? Hash
+          values.each do |value, inner_value|
+            flattened_attributes["#{key}.#{value}"] = inner_value
+          end
+        elsif values.is_a? Mongoid::Document
+          values.attributes.each do |name, attribute|
+            unless name.eql? '_id'
+              flattened_attributes["#{values.class.to_s.downcase}.#{name}"] = values.send(name)
+            end
+          end
+        elsif values.is_a? Array # Don't do anything
+        else
+          flattened_attributes[key] = values
+        end
       end
     end
     flattened_attributes
@@ -153,7 +178,7 @@ module MongoidFixtures
   end
 
   def self.resolve_class_ignore_plurality(class_name)
-    class_name = class_name.split('_').map(&:capitalize).join('')
+    class_name = ActiveSupport::Inflector.singularize(class_name.split('_').map(&:capitalize).join(''))
     if class_exists?(class_name) then
       Kernel.const_get(class_name)
     else

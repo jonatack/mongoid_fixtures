@@ -12,6 +12,39 @@
   consolidated: 1989
   custom_attributes:
     - boroughs: ['Manhattan', 'The Bronx', 'Brooklyn', 'Queens', 'Staten Island']
+  :people:
+    - first_name: Kareem
+      paternal_surname: Abdul-Jabbar
+      born: April 16, 1947
+      description: basketball player
+    - first_name: Robert
+      middle_name: John
+      paternal_surname: Downey
+      suffix: Jr.
+      born: April 4, 1965
+      description: an American actor whose career has included critical and popular success in his youth, followed by a period of substance abuse and legal troubles, and a resurgence of commercial success in middle age.
+    - first_name: Edward
+      middle_name: Kennedy
+      paternal_surname: Ellington
+      nick_names: 
+        - Duke
+      born: April 29, 1899
+      died: May 24, 1974
+      description: was an American composer, pianist and bandleader of jazz orchestras. He led his orchestra from 1923 until his death, his career spanning over 50 years.
+    - first_name: Christopher
+      middle_name: George
+      paternal_surname: Latore
+      maternal_surname: Wallace
+      nick_names:  
+        - The Notorious B.I.G.
+        - B.I.G.
+        - Biggie Smalls
+        - Big Poppa
+        - Frank White
+        - King of New York
+      born: May 21, 1972
+      died: March 9, 1997
+      description: was an American rapper. Wallace is consistently ranked as one of the greatest rappers ever and one of the most influential rappers of all time.
   state: :new_york
   geo_uri_scheme: :new_york_city
 :terrytown:

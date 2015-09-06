@@ -84,7 +84,7 @@ describe MongoidFixtures do
   end
 
   describe '::load(City)' do
-    it 'loads City fixture data into the db and returns a hash of all cities' do
+    it 'loads City fixture data into the db and returns a hash of all cities and relations' do
       cities = MongoidFixtures::load(City)
       cities.should_not be_nil
       new_york_city = cities[:new_york_city]

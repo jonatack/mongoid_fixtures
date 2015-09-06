@@ -3,6 +3,7 @@ require 'yaml'
 require 'singleton'
 require 'linguistics'
 require 'active_support/inflector'
+require 'monkey_patches/module'
 
 module MongoidFixtures
 
@@ -16,9 +17,11 @@ module MongoidFixtures
     end
 
     def self.load
-      fix = MongoidFixtures::Loader.instance
-      fixture_names = Dir[File.join(File.expand_path('../..', __FILE__), "#{path}/*.yml")]
+      load_fixtures Dir[File.join(File.expand_path('../..', __FILE__), "#{path}/*.yml")]
+    end
 
+    def self.load_fixtures(fixture_names)
+      fix = MongoidFixtures::Loader.instance
       fixture_names.each do |fixture|
         fix.fixtures[File.basename(fixture, '.*')] = YAML.load_file(fixture)
       end
@@ -33,6 +36,7 @@ module MongoidFixtures
       Loader.instance.path
     end
   end
+  :private
 
   Linguistics.use(:en)
   Loader::path = 'test/fixtures'
@@ -51,9 +55,9 @@ module MongoidFixtures
 
         value = fixture_instance[field]
         field_label = field.to_s.capitalize
-        field_clazz = resolve_class_ignore_plurality(field_label)
+        field_clazz = Module.resolve_class_ignore_plurality(field_label)
 
-        # If the current value is a symbol then it respresents another fixture.
+        # If the current value is a symbol then it represents another fixture.
         # Find it and store its id
         if value.is_a? Symbol or value.nil?
           relations = instance.relations
@@ -65,7 +69,7 @@ module MongoidFixtures
               raise "#{instance} relationship not defined: #{relations[field].relation}"
             end
           else
-            raise 'Symbol doesn\'t reference relationship'
+            raise "Symbol (#{value.nil? ? value : 'nil'}) doesn't reference relationship"
           end
 
         elsif value.is_a? Array
@@ -89,47 +93,9 @@ module MongoidFixtures
           instance[field] = value
         end
       end
-
-
-      instance = create_or_save_instance(instance)
-      instances[key] = instance # store it based on its key name
+      instances[key] = create_or_save_instance(instance) # store it based on its key name
     end
     instances
-  end
-
-  def self.create_embedded_instance(clazz, hash, instance)
-    embed = clazz.new
-    hash.each do |key, value|
-      embed.send("#{key}=", value)
-    end
-    embed.send("#{find_embed_parent_class(embed)}=", instance)
-    embed
-  end
-
-  def self.find_embed_parent_class(embed)
-    relations = embed.relations
-
-    relations.each do |name, relation|
-      if relation.relation.eql? Mongoid::Relations::Embedded::In
-        return name
-      end
-    end
-    raise 'Unable to find parent class'
-  end
-
-  def self.insert_embedded_ids(instance)
-    attributes = instance.attributes.select { |key, value| !key.to_s.eql?('_id') }
-
-    attributes.each do |key, value|
-      if attributes[key].is_a? Hash
-        unless instance.send(key)._id.nil?
-          attributes[key]['_id'] = instance.send(key)._id
-        end
-      else
-        attributes[key] = value
-      end
-    end
-    attributes
   end
 
   def self.flatten_attributes(attributes)
@@ -164,6 +130,7 @@ module MongoidFixtures
     end
     flattened_attributes
   end
+  :private
 
   def self.create_or_save_instance(instance)
     attributes = instance.attributes.select { |key, value| !key.to_s.eql?('_id') }
@@ -176,25 +143,44 @@ module MongoidFixtures
     end
     instance
   end
+  :private
 
-  def self.resolve_class_ignore_plurality(class_name)
-    class_name = ActiveSupport::Inflector.singularize(class_name.split('_').map(&:capitalize).join(''))
-    if class_exists?(class_name) then
-      Kernel.const_get(class_name)
-    else
-      if class_exists?(class_name[0, (class_name.size - 1)]) then
-        Kernel.const_get(class_name[0, (class_name.size - 1)])
-      else
-        nil
+  def self.create_embedded_instance(clazz, hash, instance)
+    embed = clazz.new
+    hash.each do |key, value|
+      embed.send("#{key}=", value)
+    end
+    embed.send("#{find_embed_parent_class(embed)}=", instance)
+    embed
+  end
+  :private
+
+  def self.find_embed_parent_class(embed)
+    relations = embed.relations
+
+    relations.each do |name, relation|
+      if relation.relation.eql? Mongoid::Relations::Embedded::In
+        return name
       end
     end
+    raise 'Unable to find parent class'
   end
+  :private
 
-  def self.class_exists?(class_name)
-    klass = Module.const_get(class_name)
-    return klass.is_a?(Class)
-  rescue NameError
-    return false
+  def self.insert_embedded_ids(instance)
+    attributes = instance.attributes.select { |key, value| !key.to_s.eql?('_id') }
+
+    attributes.each do |key, value|
+      if attributes[key].is_a? Hash
+        unless instance.send(key)._id.nil?
+          attributes[key]['_id'] = instance.send(key)._id
+        end
+      else
+        attributes[key] = value
+      end
+    end
+    attributes
   end
+  :private
 
 end

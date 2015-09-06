@@ -85,7 +85,7 @@ module MongoidFixtures
           value.each do |key, value|
             embedded_object.send("#{key}=", value)
           end
-          embedded_object.geopolitical_division = instance
+          embedded_object.send("#{find_embedd_parent_class(embedded_object)}=", instance)
           instance[field] = value
         # else just set the field
         else
@@ -98,6 +98,17 @@ module MongoidFixtures
       instances[key] = instance # store it based on its key name
     end
     instances
+  end
+
+  def self.find_embedd_parent_class(embedd)
+    relations = embedd.relations
+
+    relations.each do |name, relation|
+      if relation.relation.eql? Mongoid::Relations::Embedded::In
+        return name
+      end
+    end
+    raise 'Unable to find parent class'
   end
 
   def self.insert_embedded_ids(instance)

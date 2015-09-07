@@ -4,6 +4,7 @@ require 'singleton'
 require 'linguistics'
 require 'active_support/inflector'
 require 'monkey_patches/module'
+require_relative 'mongoid_fixtures/embed_utils'
 
 module MongoidFixtures
 
@@ -78,7 +79,7 @@ module MongoidFixtures
             if field_clazz.nil?
               values << v
             else
-              values << create_embedded_instance(field_clazz, v, instance)
+              values << EmbedUtils.create_embedded_instance(field_clazz, v, instance)
             end
           end
           if instance[field].nil?
@@ -87,7 +88,7 @@ module MongoidFixtures
           instance[field].concat(values)
         elsif value.is_a? Hash
           # take hash convert it to object and serialize it
-          instance[field] = create_embedded_instance(field_clazz, value, instance)
+          instance[field] = EmbedUtils.create_embedded_instance(field_clazz, value, instance)
         # else just set the field
         else
           instance[field] = value
@@ -138,49 +139,13 @@ module MongoidFixtures
     if instance.class.where(flattened_attributes).exists?
       instance = instance.class.where(flattened_attributes).first
     else
-      insert_embedded_ids(instance)
+      EmbedUtils.insert_embedded_ids(instance)
       instance.save! # auto serialize the document
     end
     instance
   end
   :private
 
-  def self.create_embedded_instance(clazz, hash, instance)
-    embed = clazz.new
-    hash.each do |key, value|
-      embed.send("#{key}=", value)
-    end
-    embed.send("#{find_embed_parent_class(embed)}=", instance)
-    embed
-  end
-  :private
 
-  def self.find_embed_parent_class(embed)
-    relations = embed.relations
-
-    relations.each do |name, relation|
-      if relation.relation.eql? Mongoid::Relations::Embedded::In
-        return name
-      end
-    end
-    raise 'Unable to find parent class'
-  end
-  :private
-
-  def self.insert_embedded_ids(instance)
-    attributes = instance.attributes.select { |key, value| !key.to_s.eql?('_id') }
-
-    attributes.each do |key, value|
-      if attributes[key].is_a? Hash
-        unless instance.send(key)._id.nil?
-          attributes[key]['_id'] = instance.send(key)._id
-        end
-      else
-        attributes[key] = value
-      end
-    end
-    attributes
-  end
-  :private
 
 end

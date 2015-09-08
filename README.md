@@ -1,5 +1,5 @@
 # MongoidFixtures
-Fixtures for Ruby without Rails for Mongoid.
+Fixtures for Ruby for Mongoid. No Rails needed!
 
 ## Installation
 

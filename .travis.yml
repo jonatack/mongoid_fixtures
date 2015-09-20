@@ -4,3 +4,10 @@ rvm:
 
 before_install:
   - gem install bundler
+
+services:
+  - mongodb
+
+before_script:
+  - sleep 15
+  - mongo mongoid_fixtures_development --eval 'db.addUser("travis", "test");'

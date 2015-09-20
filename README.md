@@ -197,12 +197,12 @@ Or install it yourself as:
     1-N referenced, 1-1 referenced, 1-1 embedded relationships, and 1-N embedded relationships.
     If a relation already exists in the db, this library will return it instead of recreating it.
     
-3.  Invoke `MongoidFixtures::load(City)`
+3.  Invoke `MongoidFixtures.load(City)`
 4.  The above method invocation will load all test fixture instances of City objects defined
     in /test/fixtures/cities.yml as well as dependent objects
 5.  Use your fixtures!
 
-        cities = MongoidFixtures::load(City)
+        cities = MongoidFixtures.load(City)
         puts cities # {:new_york_city=>#<City _id: 55ebc6b2e138231068000004, name: "New York City", time_zone: nil, demonym: "New Yorker", settled: 1624, consolidated: 1989, custom_attributes: [{"boroughs"=>["Manhattan", "The Bronx", "Brooklyn", "Queens", "Staten Island"]}], geo_uri_scheme_id: BSON::ObjectId('55ebc6b2e138231068000006'), _type: "City", state_id: BSON::ObjectId('55ebc6b2e138231068000000')>, :terrytown=>#<City _id: 55ebc6b2e13823106800000c, name: "Terrytown", time_zone: nil, demonym: nil, settled: nil, consolidated: nil, custom_attributes: nil, geo_uri_scheme_id: BSON::ObjectId('55ebc6b2e138231068000005'), _type: "City", state_id: BSON::ObjectId('55ebc6b2e138231068000002')>}
 
     In the DB:

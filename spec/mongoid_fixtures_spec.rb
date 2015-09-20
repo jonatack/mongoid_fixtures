@@ -56,9 +56,9 @@ class GeoUriScheme
   field :y, type: Float
   field :z, type: Float
 
-  alias :longitude :x
-  alias :latitude :y
-  alias :altitude :z
+  alias_method(:longitude, :x)
+  alias_method(:latitude, :y)
+  alias_method(:altitude, :z)
 end
 
 class Person
@@ -80,15 +80,15 @@ end
 
 
 describe MongoidFixtures do
-  describe '::load' do
+  describe '.load' do
     it 'loads fixtures into the db and returns a hash of the fixtures' do
-      MongoidFixtures::load(State).should_not be_nil
+      MongoidFixtures.load(State).should_not be_nil
     end
   end
 
-  describe '::load(City)' do
+  describe '.load(City)' do
     it 'loads City fixture data into the db and returns a hash of all cities and relations' do
-      cities = MongoidFixtures::load(City)
+      cities = MongoidFixtures.load(City)
       cities.should_not be_nil
       new_york_city = cities[:new_york_city]
       new_york_city.should_not be_nil
@@ -123,11 +123,11 @@ describe MongoidFixtures do
     end
   end
 
-  describe '::load(GeoURIScheme)' do
+  describe '.load(GeoURIScheme)' do
     it 'loads GeoURIScheme fixture data into the db and returns a hash of all GeoUriSchemes' do
-      MongoidFixtures::load(GeoUriScheme)
-      MongoidFixtures::load(GeoUriScheme).should_not be_nil
-      terrytown = MongoidFixtures::load(GeoUriScheme)[:terrytown]
+      MongoidFixtures.load(GeoUriScheme)
+      MongoidFixtures.load(GeoUriScheme).should_not be_nil
+      terrytown = MongoidFixtures.load(GeoUriScheme)[:terrytown]
       terrytown._id.should_not be_nil
 
       terrytown.x.should eq(-90.029444)

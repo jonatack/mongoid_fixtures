@@ -20,7 +20,7 @@ module EmbedUtils
   end
 
   def self.insert_embedded_ids(instance)
-    attributes = instance.attributes.select { |key, value| !key.to_s.eql?('_id') }
+    attributes = instance.attributes.select { |key, _| !key.to_s.eql?('_id') }
 
     attributes.each do |key, value|
       if attributes[key].is_a? Hash

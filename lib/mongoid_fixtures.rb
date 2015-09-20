@@ -40,8 +40,8 @@ module MongoidFixtures
   :private
 
   Linguistics.use(:en)
-  Loader::path = 'test/fixtures'
-  Loader::load
+  Loader.path = 'test/fixtures'
+  Loader.load
 
   def self.load(clazz)
     fixture_instances = Loader.instance.fixtures[clazz.to_s.downcase.en.plural] # get class name

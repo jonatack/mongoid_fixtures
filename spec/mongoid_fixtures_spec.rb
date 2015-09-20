@@ -1,3 +1,6 @@
+require "codeclimate-test-reporter"
+CodeClimate::TestReporter.start
+
 require_relative '../lib/mongoid_fixtures'
 require 'mongoid'
 require 'rspec'

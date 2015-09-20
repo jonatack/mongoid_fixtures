@@ -1,6 +1,11 @@
 # MongoidFixtures
 Fixtures for Ruby for Mongoid. No Rails needed!
 
+[![Gem Version](https://badge.fury.io/rb/mongoid_fixtures.svg)](http://badge.fury.io/rb/mongoid_fixtures)
+[![Code Climate](https://codeclimate.com/github/nycjv321/mongoid_fixtures/badges/gpa.svg)](https://codeclimate.com/github/nycjv321/mongoid_fixtures)
+[![Build Status](https://travis-ci.org/nycjv321/mongoid_fixtures.svg?branch=master)](https://travis-ci.org/nycjv321/mongoid_fixtures)
+[![Test Coverage](https://codeclimate.com/github/nycjv321/mongoid_fixtures/badges/coverage.svg)](https://codeclimate.com/github/nycjv321/mongoid_fixtures/coverage)
+
 ## Installation
 
 Add this line to your application's Gemfile:

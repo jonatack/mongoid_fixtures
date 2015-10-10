@@ -4,6 +4,7 @@ CodeClimate::TestReporter.start
 require_relative '../lib/mongoid_fixtures'
 require 'mongoid'
 require 'rspec'
+require 'bcrypt'
 
 Mongoid.load!(File.join(File.expand_path('../..', __FILE__), "/config.yml"), :development)
 
@@ -78,6 +79,17 @@ class Person
 
 end
 
+class User
+  include Mongoid::Document
+  include BCrypt
+  field :user_name, type: String
+  field :password, type: String
+
+  def password=(password)
+    self[:password] = Password.create(password)
+  end
+
+end
 
 describe MongoidFixtures do
   describe '.load' do
@@ -125,7 +137,6 @@ describe MongoidFixtures do
 
   describe '.load(GeoURIScheme)' do
     it 'loads GeoURIScheme fixture data into the db and returns a hash of all GeoUriSchemes' do
-      MongoidFixtures.load(GeoUriScheme)
       MongoidFixtures.load(GeoUriScheme).should_not be_nil
       terrytown = MongoidFixtures.load(GeoUriScheme)[:terrytown]
       terrytown._id.should_not be_nil
@@ -133,6 +144,13 @@ describe MongoidFixtures do
       terrytown.x.should eq(-90.029444)
       terrytown.y.should eq(29.902222)
       terrytown.z.should eq(3.9624)
+    end
+  end
+
+  describe '.load(User)' do
+    it 'loads attributes based on accessors and not fields' do
+      user = MongoidFixtures.load(User)[:example_user]
+      user.password.should_not eq('test_password')
     end
   end
 end

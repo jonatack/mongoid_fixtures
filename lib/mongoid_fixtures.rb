@@ -89,14 +89,22 @@ module MongoidFixtures
         elsif value.is_a? Hash
           # take hash convert it to object and serialize it
           instance[field] = EmbedUtils.create_embedded_instance(field_clazz, value, instance)
-        # else just set the field
+          # else just set the field
         else
-          instance[field] = value
+          if include_setter?(instance, field)
+            instance.send("#{field}=", value)
+          else
+            instance[field] = value
+          end
         end
       end
       instances[key] = create_or_save_instance(instance) # store it based on its key name
     end
     instances
+  end
+
+  def self.include_setter?(instance, setter)
+    instance.class.instance_methods.include? "#{setter}=".to_sym
   end
 
   def self.flatten_attributes(attributes)
@@ -131,6 +139,7 @@ module MongoidFixtures
     end
     flattened_attributes
   end
+
   :private
 
   def self.create_or_save_instance(instance)
@@ -144,8 +153,8 @@ module MongoidFixtures
     end
     instance
   end
-  :private
 
+  :private
 
 
 end

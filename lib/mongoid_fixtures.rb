@@ -18,7 +18,13 @@ module MongoidFixtures
     end
 
     def self.load
-      load_fixtures Dir["../#{path}/*.yml"]
+      if Dir.exists?("#{path}")
+        load_fixtures Dir["#{path}/*.yml"]
+      elsif Dir.exists?("../#{path}")
+        load_fixtures Dir["../#{path}/*.yml"]
+      else
+        raise('Unable to find fixtures in either /test/fixtures or ../test/fixtures')
+      end
     end
 
     def self.load_fixtures(fixture_names)

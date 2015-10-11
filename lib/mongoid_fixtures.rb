@@ -18,7 +18,7 @@ module MongoidFixtures
     end
 
     def self.load
-      load_fixtures Dir[File.join(File.expand_path('../..', __FILE__), "#{path}/*.yml")]
+      load_fixtures Dir["../#{path}/*.yml"]
     end
 
     def self.load_fixtures(fixture_names)

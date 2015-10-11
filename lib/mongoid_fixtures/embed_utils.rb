@@ -1,6 +1,11 @@
 module EmbedUtils
   def self.create_embedded_instance(clazz, hash, instance)
     embed = clazz.new
+
+    unless hash.is_a? Hash
+      raise("#{hash} was supposed to be a collection of #{embed}. You have configured #{clazz} objects to be embedded instances of #{instance}.\nPlease store these objects within the #{instance} yml. Refer to the documentation for examples.")
+    end
+
     hash.each do |key, value|
       embed.send("#{key}=", value)
     end

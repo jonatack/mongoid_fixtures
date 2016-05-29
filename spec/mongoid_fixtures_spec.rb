@@ -6,7 +6,7 @@ require 'mongoid'
 require 'rspec'
 require 'bcrypt'
 
-Mongoid.load!(File.join(File.expand_path('../..', __FILE__), "/config.yml"), :development)
+Mongoid.load!(File.join(File.expand_path('../..', __FILE__), '/config.yml'), :development)
 
 class GeopoliticalDivision
   include Mongoid::Document

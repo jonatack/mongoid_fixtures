@@ -23,6 +23,12 @@ Or install it yourself as:
 
     $ gem install mongoid_fixtures
 
+### Version
+
+  Use "0.1.4" for mongoid '~> 4.0.2'
+  Use "0.2" for mongoid  '~> 5.1'
+
+
 ## Example Usage
 
 1.  Define some Mongoid Documents. The class structure is pretty silly and only meant to demonstrate the different modes. 

@@ -27,11 +27,11 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
-  spec.add_development_dependency 'bundler', '~> 1.10'
-  spec.add_development_dependency 'rake', '~> 10.0'
+  spec.add_development_dependency 'bundler', '~> 1.16'
+  spec.add_development_dependency 'rake', '~> 12.3'
   spec.add_development_dependency 'rspec'
   spec.add_dependency  'linguistics',   '~> 2.0.4'
-  spec.add_dependency  'mongoid', '~> 5.1'
+  spec.add_dependency  'mongoid', '~> 7.0'
   spec.add_dependency  'monkey_patches', '~> 0.0.3'
   spec.add_development_dependency 'bcrypt'
 end
